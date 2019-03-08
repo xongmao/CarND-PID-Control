@@ -1,0 +1,14 @@
+P component of the PID algorithm is proportion to cte(cross track error), in my implementation it corresponds to "p_error"(member variables in PID class).
+but only "p_error" makes car overshoots and the result is that the trajectory of the car oscillates up and down the target trajectory.
+D component of the PID algorithm is proportion to the derivative of cte, in my implementation it corresponds to "d_error"(member variables in PID class).
+The effect of "d_error" is to cancel out car overshoots and oscillates caused by "p_error".
+I component of the PID algorithm is proportion to the int of cte, in my implementation it corresponds to "i_error"(member variables in PID class).
+For "systematic bias" that may be caused by some error, P component and D component will not work(causes a big cte), I component can cancel out "systematic bias".
+In my implementation for each timesteps updating P, I, D component is in function "UpdateError" of PID class.
+In my implementation chose the final hyperparameters (P, I, D coefficients) by using "twiddle" algorithm(code line:74-252 main.cpp).
+I think "twiddle" algorithm is essentially a search algorithm, because it searches for an optimal parameter combination in parameter space.
+"twiddle" algorithm can also be regarded as an optimization problem to find the optimal solution for a given objective function (the mean value of cte), i.e. the maximum or minimum value.
+I think the main idea of "twiddle" algorithm is based on the assumption of local linear correlation.
+For example, for P coefficients "Kp" if the best_error is greater than the error by increasing the increment 1.0 to "Kp+1.0" from "t-1" time step, 
+it means that at "t-1" time step is positively correlated with at "t" time step, then incremental 1.0 to 1.1 is needed to expand the search space,
+similar to moving along the gradient direction in the optimization process. otherwise if negative correlation is expressed between "t-1" time step and "t" time step, the search space needs to be reduced by decreasing the increment 1.0 to 0.9, which is similar to the reverse direction of the gradient in the optimization process. Because the interval between "t-1" time step and "t" time step is very short, the local linear assumption is correct.
